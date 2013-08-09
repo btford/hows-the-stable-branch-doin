@@ -1,0 +1,24 @@
+{
+  "name": "hows-the-stable-branch-doin",
+  "version": "0.0.0",
+  "description": "compare the stable branch against the master branch and make sure fixes make it in",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "hows-the-stable-branch-doin": "main.js"
+  },
+  "global": true,
+  "keywords": [
+    "git"
+  ],
+  "author": "Brian Ford",
+  "license": "MIT",
+  "dependencies": {
+    "semver": "~2.1.0",
+    "q": "~0.9.6",
+    "lodash": "~1.3.1"
+  }
+}
