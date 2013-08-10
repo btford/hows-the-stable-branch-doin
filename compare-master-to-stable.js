@@ -24,7 +24,7 @@ var andThen = function (fn, after) {
   };
 };
 
-var firstArg = function (fn) {
+var oneArg = function (fn) {
   return function (arg) {
     return fn(arg);
   };
@@ -70,15 +70,21 @@ var allInSeries = function (fn) {
 
 var compareBranches = function (left, right) {
   console.log('# These commits are in ' + left.name + ' but not in ' + right.name + '\n');
-  console.log(_.difference(left.log, right.log).join('\n'));
+  console.log(_(left.log).
+    difference(right.log).
+    map(function (line) {
+      return left.full[left.log.indexOf(line)]; // lol O(n^2)
+    }).
+    value().
+    join('\n'));
 };
 
-var checkout = firstArg(exec('git checkout %s'));
+var checkout = oneArg(exec('git checkout %s'));
 
 var getCurrentBranch = andThen(noArgs(exec('git rev-parse --abbrev-ref HEAD')), oneLine);
 var getTags = noArgs(exec('git tag'));
-var getShaOfTag = firstArg(exec('git rev-list %s | head -n 1'));
-var getTheLog = firstArg(exec('git log --pretty=oneline %s..HEAD | cat'));
+var getShaOfTag = oneArg(exec('git rev-list %s | head -n 1'));
+var getTheLog = oneArg(exec('git log --pretty=oneline %s..HEAD | cat'));
 
 // remember this so we can restore state
 var currentBranch;
@@ -127,13 +133,18 @@ then(allInSeries(function (branch) {
     }).
     then(function (log) {
       return log.
-        filter(identity).
-        map(function (line) {
-          return line.substr(41);
-        });
+        filter(identity);
     }).
     then(function (log) {
-      branch.log = log;
+      branch.full = log.map(function (line) {
+        line = line.split(' ');
+        var sha = line.shift();
+        var msg = line.join(' ');
+        return sha + (msg.toLowerCase().indexOf('fix') === -1 ? '   ' : ' * ') + msg;
+      });
+      branch.log = log.map(function (line) {
+        return line.substr(41)
+      });
       return branch;
     });
 })).

@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "hows-the-stable-branch-doin": "main.js"
+    "hows-the-stable-branch-doin": "compare-master-to-stable.js"
   },
   "global": true,
   "keywords": [
